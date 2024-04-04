@@ -7,7 +7,8 @@
 
 ### New Features
 * Discrete Hilbert spaces now use a special {class}`nk.utils.StaticRange` object to store the local values that label the local degree of freedom. This special object is jax friendly and can be converted to arrays, and allows for easy conversion from the local degrees of freedom to integers that can be used to index into arrays, and back. While those objects are not really used internally yet, in the future they will be used to simplify the implementations of operators and other objects [#1732](https://github.com/netket/netket/issues/1732).
-
+* Some utilities to time execution of training loop are now provided, that can be used to coarsely see what part of the algorithm is dominating the training cost. To use it, pass `driver.run(..., timeit=True)` to all drivers when running them.
+* Added several new tensor network ansatze to the `nk.models.tensor_networks` namespace. Those also replace previous tensor network implementations, that were de-facto broken [#1745](https://github.com/netket/netket/issues/1745)..
 
 ### Breaking Changes
 * The `out` keyword of Discrete Hilbert indexing methods (`all_states`, `numbers_to_states` and `states_to_numbers`) deprecated in the last release has been removed completely [#1722](https://github.com/netket/netket/issues/1722).
@@ -17,12 +18,15 @@
 
 ### Improvements
 * Rewrite the code for generating random states of `netket.hilbert.Fock` and `netket.hilbert.Spin` in Jax and jit the `init` and `reset` functions of `netket.sampler.MetropolisSampler` for better performance and improved compatibility with sharding [#1721](https://github.com/netket/netket/pull/1721).
+* Rewrite `netket.hilbert.index` used by `HomogeneousHilbert` (including `Spin` and `Fock`) so that larger spaces with a sum constraint can be indexed. This can be useful for `netket.sampler.Exactsampler`, `netket.vqs.FullSumState` as well as for ED calculations [#1720](https://github.com/netket/netket/pull/1720).
+* Support QuTiP 5, released in march 2024 [#1762](https://github.com/netket/netket/pull/1762).
 
 ### Internal changes
 
 
 ### Bug Fixes
-
+* Fixes a bug where the conjugate of a fermionic operator was the conjugate-transpose, and the hermitian transpose `.H` was the identity [#1743](https://github.com/netket/netket/pull/1743).
+* Fixed a bug when converting jax operators to qutip format.
 
 
 ## NetKet 3.11.2 (27 february 2024)

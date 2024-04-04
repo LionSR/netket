@@ -434,12 +434,18 @@ def test_is_hermitian_generic_op(ops):
     assert not oph.is_hermitian
 
 
-def test_qutip_conversion():
+@pytest.mark.parametrize(
+    "jax",
+    [pytest.param(op) for op in [True, False]],
+)
+def test_qutip_conversion(jax):
     # skip test if qutip not installed
     pytest.importorskip("qutip")
 
     hi = nk.hilbert.Spin(s=1 / 2, N=2)
     op = nk.operator.spin.sigmax(hi, 0)
+    if jax:
+        op = op.to_jax_operator()
 
     q_obj = op.to_qobj()
 
@@ -449,7 +455,7 @@ def test_qutip_conversion():
     assert q_obj.dims[1] == list(op.hilbert.shape)
 
     assert q_obj.shape == (op.hilbert.n_states, op.hilbert.n_states)
-    np.testing.assert_allclose(q_obj.data.todense(), op.to_dense())
+    np.testing.assert_allclose(q_obj.data.to_array(), op.to_dense())
 
 
 def test_notsharing():
